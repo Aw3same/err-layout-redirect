@@ -12,11 +12,13 @@ export function useUser() {
   const navigate = useNavigate();
 
   const login = () => {
-    setUser(userData);
-    sessionStorage.setItem('userData', JSON.stringify(userData));
-    console.log('session', sessionStorage.getItem('userData'));
-    console.log('user', user);
-    navigate('home');
+    setTimeout(() => {
+      setUser(userData);
+      sessionStorage.setItem('userData', JSON.stringify(userData));
+      console.log('session', sessionStorage.getItem('userData'));
+      console.log('user', user);
+      navigate('home');
+    }, 500);
   };
 
   const logout = () => {
