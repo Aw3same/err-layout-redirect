@@ -12,22 +12,19 @@ export function useUser() {
   const navigate = useNavigate();
 
   const login = () => {
-    setTimeout(() => {
+    // setTimeout(() => {
       setUser(userData);
       sessionStorage.setItem('userData', JSON.stringify(userData));
-      console.log('session', sessionStorage.getItem('userData'));
-      console.log('user', user);
       navigate('home');
-    }, 500);
+    // }, 500);
   };
 
   const logout = () => {
-    setTimeout(() => {
+    // setTimeout(() => {
       sessionStorage.clear();
       setUser(null);
       navigate('login');
-      console.log('session', sessionStorage.getItem('userData'));
-    }, 500);
+    // }, 500);
   };
 
   return {
@@ -39,17 +36,9 @@ export function useUser() {
 }
 
 /**
- * REAL CODE 
+ * REAL CODE - Not working
  * 
- * import { useMutation, useQuery } from '@tanstack/react-query'
-import { signIn, signOut } from 'feature/authentication/services/authService'
-import jwt_decode from 'jwt-decode'
-import { TokenDecoded } from 'feature/shared/types/tokenResponse'
-import getUserProfile from 'services/getUserProfile'
-import { useNavigate } from 'react-router-dom'
-import { AuthContext } from 'context/AuthContext'
-import { useContext } from 'react'
-
+ * 
 export function useUser() {
 	const { token, setToken, user, setUser } = useContext(AuthContext)
 
@@ -110,4 +99,56 @@ export function useUser() {
 	}
 }
 
+ */
+
+/** REACT QUERY - Working
+ * 
+ * export function useUser() {
+	const { token, setToken, user, setUser } = useContext(AuthContext)
+	const navigate = useNavigate()
+
+	const {
+		mutate: login,
+		isLoading: isLoginLoading,
+		isError: hasLoginError
+	} = useMutation({
+		mutationFn: signIn,
+		onSuccess: async (tokenResponse) => {
+			sessionStorage.setItem('access_token', tokenResponse.access_token)
+			sessionStorage.setItem('refresh_token', tokenResponse.refresh_token)
+			setToken(tokenResponse.access_token)
+      // Here is the logic of the other query
+			const user = await getUserProfile()
+			setUser(user)
+			sessionStorage.setItem('userData', JSON.stringify(user))
+	 		navigate('/home')
+		},
+		onError: () => {
+			sessionStorage.removeItem('access_token')
+		}
+	})
+
+	const { mutate: logout } = useMutation({
+		mutationFn: signOut,
+		onMutate: () => {
+			sessionStorage.clear()
+			setToken(null)
+			setUser(null)
+		},
+		onSuccess: async () => {
+			navigate('/login')
+		}
+	})
+
+
+	return {
+		login,
+		logout,		
+		isLoginLoading,
+		hasLoginError,
+		userPermissions: token ? (jwt_decode(token) as TokenDecoded).authorities : [],
+		user
+	}
+}
+ * 
  */
