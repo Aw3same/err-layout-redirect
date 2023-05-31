@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
-import { Suspense, lazy } from 'react';
 import { Login } from './feature/login/Login';
 import { Home } from './feature/home/Home';
 import { AuthLayout } from './layouts/AuthLayout';
